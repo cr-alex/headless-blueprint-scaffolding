@@ -3,8 +3,10 @@ import Head from "next/head";
 import EntryHeader from "../components/entry-header";
 import Footer from "../components/footer";
 import Header from "../components/header";
+import blocks from "../wp-blocks";
+import CoreCode from "../wp-blocks/CoreCode";
+
 export default function Component(props) {
-  // Loading state for previews
   if (props.loading) {
     return <>Loading...</>;
   }
@@ -29,6 +31,7 @@ export default function Component(props) {
       <main className="container">
         <EntryHeader title={title} date={date} author={author.node.name} />
         <div dangerouslySetInnerHTML={{ __html: content }} />
+        <CoreCode attributes={props}/>
       </main>
 
       <Footer />
@@ -45,11 +48,20 @@ Component.variables = ({ databaseId }, ctx) => {
 
 Component.query = gql`
   ${Header.fragments.entry}
+  ${blocks.CoreCode.fragments.entry}
   query GetPost($databaseId: ID!, $asPreview: Boolean = false) {
     post(id: $databaseId, idType: DATABASE_ID, asPreview: $asPreview) {
       title
       content
       date
+      editorBlocks {
+        name
+        __typename
+        renderedHtml
+        id: clientId
+        parentClientId
+        ...${blocks.CoreCode.fragments.key}
+      }
       author {
         node {
           name

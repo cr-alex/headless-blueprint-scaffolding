@@ -3,8 +3,10 @@ import Head from "next/head";
 import EntryHeader from "../components/entry-header";
 import Footer from "../components/footer";
 import Header from "../components/header";
+import BlockRenderer from "../wp-blocks/BlockRenderer";
 
 export default function Component(props) {
+  console.log(props);
   // Loading state for previews
   if (props.loading) {
     return <>Loading...</>;
@@ -29,7 +31,7 @@ export default function Component(props) {
 
       <main className="container">
         <EntryHeader title={title} />
-        <div dangerouslySetInnerHTML={{ __html: content }} />
+        <BlockRenderer elementorData={JSON.parse(props.data.page.elementorData)} />
       </main>
 
       <Footer />
@@ -50,6 +52,7 @@ Component.query = gql`
     page(id: $databaseId, idType: DATABASE_ID, asPreview: $asPreview) {
       title
       content
+      elementorData
     }
     ...HeaderFragment
   }
